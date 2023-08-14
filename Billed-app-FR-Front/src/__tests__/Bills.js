@@ -59,9 +59,8 @@ describe("Given I am connected as an employee", () => {
       })
       BillsInstance.getBills()
     })
-
-    
-    test("newBill button should call the function handleClickNewBill", ()=> {
+ 
+    test("then if I press the newBill button it should call the function handleClickNewBill", ()=> {
 
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
@@ -90,7 +89,7 @@ describe("Given I am connected as an employee", () => {
       expect(screen.getByTestId("form-new-bill")).toBeTruthy()//√  NewBill page loaded
     })
 
-    test("on click, eye shaped icon should display a modal", ()=> {
+    test("then if eye shaped icon is pressed, it should display a modal", ()=> {
       const billsInstance = new Bills({
         document,
         onNavigate,
@@ -121,12 +120,12 @@ describe("Given I am connected as an employee", () => {
 })
 
 // test d'intégration GET
-describe("Given I am a user connected as Admin", () => {
+describe("Given I am a user connected as Employee", () => {
   describe("When I navigate to Bills", () => {
     beforeEach(() => {
       jest.spyOn(mockStore, "bills")
       
-      Object.defineProperty(window, "localStorage", { value: localStorageMock });
+      Object.defineProperty(window, "localStorage", { value: localStorageMock })
       window.localStorage.setItem(
         "user",
         JSON.stringify({
@@ -145,7 +144,7 @@ describe("Given I am a user connected as Admin", () => {
       window.onNavigate(ROUTES_PATH.Bills)
       const bills = await mockStore.bills().list()
       expect(await waitFor(() => screen.getByTestId("tbody"))).toBeTruthy() // do we get the table layout?
-      expect(bills.length).toBe(4) // do we get the data?
+      expect(bills.length).toBe(4) // do we get the whole data?
     })
 
     test("Then, fetches bills from an API and fails with 404 message error", async () => {

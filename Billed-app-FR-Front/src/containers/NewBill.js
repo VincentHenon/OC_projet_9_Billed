@@ -3,6 +3,7 @@ import Logout from "./Logout.js"
 
 export default class NewBill {
   constructor({ document, onNavigate, store, localStorage }) {
+    console.log("COUCOU")
     this.document = document
     this.onNavigate = onNavigate
     this.store = store
@@ -16,8 +17,11 @@ export default class NewBill {
     new Logout({ document, localStorage, onNavigate })
   }
   handleChangeFile = e => {
+    console.log("COUCOU2")
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+    const fileError = this.document.getElementById("fileError")
+    
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
     const formData = new FormData()
@@ -26,7 +30,10 @@ export default class NewBill {
     formData.append('email', email)
     //________________________________________________________________________________________//
     // CHECK if the extension is jpeg, jpg or png.
+    console.log("coco")
+    console.log(fileError.classList.contains("hidden"))
     if (fileName.includes(".jpeg") || fileName.includes(".jpg") || fileName.includes(".png")) {
+      fileError.classList.add("hidden")
       this.store
         .bills()
         .create({
@@ -42,7 +49,8 @@ export default class NewBill {
           this.fileName = fileName
         }).catch(error => console.error(error))
     } else {
-      alert("Le document doit être au format jpg ou png.")
+      fileError.classList.remove("hidden")
+      
       throw new Error("file should be a jpg or png format.")
     }
   }
@@ -68,7 +76,6 @@ export default class NewBill {
         this.updateBill(bill)
         this.onNavigate(ROUTES_PATH['Bills'])
       } else {
-        alert('Le document doit être au format "jpeg", "jpg" ou "png".')
         throw new Error("file should be a jpg or png format.")
       }
   } 
