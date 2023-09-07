@@ -123,7 +123,7 @@ describe("Given I am connected as an employee", () => {
     jest.spyOn(mockStore, "bills")
 
     const mockCreatedBill = await mockStore.bills().create()
-    const fileName = mockCreatedBill.fileUrl.split('/').pop(); // Split the URL by '/' and keep the last part
+    const fileName = mockCreatedBill.fileUrl.split('/').pop(); // Splits the URL when '/' occurs and keeps the last part
 
     document.body.innerHTML = NewBillUI()
     window.onNavigate(ROUTES_PATH.NewBill)
@@ -135,6 +135,9 @@ describe("Given I am connected as an employee", () => {
       store : mockStore, 
       localStorage : window.localStorage 
     })
+
+    // mock the condition to launch handleSubmit with no error
+    NewBillInstance.isFileValid = true // a priori pas nécessaire???
 
     const handleSubmit = jest.fn(NewBillInstance.handleSubmit)
 
@@ -148,11 +151,10 @@ describe("Given I am connected as an employee", () => {
     // submit a valid file
     fireEvent.submit(formNewBill)
 
-    // NOT WORKING!!!!
     expect(handleSubmit).toHaveBeenCalled()
   })  
 
-  describe("Given I am a user connected as Admin", () => {
+  describe("Given I am a user connected as Employee", () => {
     beforeEach(() => {
       jest.spyOn(mockStore, "bills")
 
@@ -189,7 +191,7 @@ describe("Given I am connected as an employee", () => {
         const message = await screen.getByText(/Erreur 404/)
         expect(message).toBeTruthy()
       })
-
+      // RETURNS ERRO 500
       test("Then, fetches messages from an API and fails with 500 message error", async () => {
         // to do: mock changeFile()
         mockStore.bills.mockImplementationOnce(() => {
