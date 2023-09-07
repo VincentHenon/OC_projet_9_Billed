@@ -285,6 +285,7 @@ describe("Given I am a user connected as Admin", () => {
       window.onNavigate(ROUTES_PATH.Dashboard)
       await new Promise(process.nextTick);
       const message = await screen.getByText(/Erreur 404/)
+      console.log("message", message.innerHTML)
       expect(message).toBeTruthy()
     })
 

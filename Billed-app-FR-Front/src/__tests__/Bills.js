@@ -8,8 +8,6 @@ import userEvent from "@testing-library/user-event"
 import BillsUI from "../views/BillsUI.js"
 import Bills from "../containers/Bills.js"
 import { bills } from "../fixtures/bills.js"
-import NewBillsUI from "../views/NewBillUI.js"
-import NewBill from "../containers/NewBill.js"
 import { ROUTES, ROUTES_PATH} from "../constants/routes.js"
 import {localStorageMock} from "../__mocks__/localStorage.js"
 import mockStore from "../__mocks__/store"
@@ -35,29 +33,11 @@ describe("Given I am connected as an employee", () => {
     })
 
     test("Then bills should be ordered from earliest to latest", () => {
-      document.body.innerHTML = BillsUI({ data: bills })
-      const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
-      
-      const antiChrono = (a, b) => ((a < b) ? 1 : -1)
-      const datesSorted = [...dates].sort(antiChrono)
-      expect(dates).toEqual(datesSorted)
-
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Employee'
-      }))
-      
-      document.body.innerHTML = BillsUI({ data: { bills }})
-      
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      }
-      
-      const store = null
-      const BillsInstance = new Bills({
-        document, onNavigate, store, bills, localStorage: window.localStorage
-      })
-      BillsInstance.getBills()
+      document.body.innerHTML = BillsUI({ data: bills });
+      const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML);
+      const antiChrono = (a, b) => (a > b) ? 1 : -1;
+      const datesSorted = [ ...dates ].sort(antiChrono);
+      expect(dates).toEqual(datesSorted);
     })
  
     test("then if I press the newBill button it should call the function handleClickNewBill", ()=> {
