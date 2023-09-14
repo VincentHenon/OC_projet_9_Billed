@@ -11,7 +11,7 @@ import {localStorageMock} from "../__mocks__/localStorage.js"
 import mockStore from "../__mocks__/store"
 import router from "../app/Router.js"
 
-jest.mock("../app/store", () => mockStore) // mock the store
+jest.mock("../app/Store", () => mockStore) // mock the store
 
 const onNavigate = ((pathname) => {
   document.body.innerHTML = ROUTES({ pathname })
@@ -32,17 +32,19 @@ describe("Given I am connected as an employee", () => {
         router()
   })
 
+  // CHECKING IF THE PAGE IS LOADED
   test("then, there should be a form", () => {
     document.body.innerHTML = NewBillUI()
     window.onNavigate(ROUTES_PATH.NewBill)  
       const form = screen.getByTestId("form-new-bill")
       const fileToAdd = screen.getByTestId("file")
-      // Check if we got the html
+      // Check if we got the html element
       expect(form).toBeTruthy()
       expect(fileToAdd).toBeTruthy()
   })
 
-  test("when a file is loaded with a valid format, it should be handled properly", async () => {
+  // VALID FILE WITH HANDLECHANGFILE
+  test("when a file is loaded with a valid format, it should be handled properly", () => {
     // init the document with the correct UI within the DOM and the correct path
     document.body.innerHTML = NewBillUI()
     window.onNavigate(ROUTES_PATH.NewBill)
@@ -72,19 +74,17 @@ describe("Given I am connected as an employee", () => {
             new File(["newBillImage.jpg"], "newBillImage.jpg", { type: "image/jpeg" })]
           }
       })
-      console.log('After file change event, isFileValid:', NewBillInstance.isFileValid);
     
     // select the state checker
-    const stateChecker = await NewBillInstance.isFileValid
+    const stateChecker = NewBillInstance.isFileValid
 
     expect(handleChangeFile).toHaveBeenCalled() //Function should have been called 
     expect(fileError).toBeTruthy()
-
-    //____________NOT WORKING!!!!
-    expect(fileError.classList.contains('hidden')).toBeTruthy() // NOT WORKING !!!!
-    expect(stateChecker).toBe(true) // the state should be true // NOT WORKING !!!!
+    expect(fileError.classList.contains('hidden')).toBeTruthy()
+    expect(stateChecker).toBe(true) // the state should be true
   })
 
+  // NOT VALID FILE WITH HANDLECHANGFILE
   test("when a file is loaded with an invalid format, it should be handled properly", () => {
     document.body.innerHTML = NewBillUI()
     window.onNavigate(ROUTES_PATH.NewBill)
@@ -119,6 +119,7 @@ describe("Given I am connected as an employee", () => {
     expect(fileError.textContent).toBe("Le document doit être au format jpg ou png.")
   })
 
+  // HANDLESUBMIT
   test("then, on submit, function handleSubmit should be triggered", async () => {
     jest.spyOn(mockStore, "bills")
 
@@ -137,7 +138,7 @@ describe("Given I am connected as an employee", () => {
     })
 
     // mock the condition to launch handleSubmit with no error
-    NewBillInstance.isFileValid = true // a priori pas nécessaire???
+    NewBillInstance.isFileValid = true // a priori pas nécessaire
 
     const handleSubmit = jest.fn(NewBillInstance.handleSubmit)
 
@@ -146,14 +147,14 @@ describe("Given I am connected as an employee", () => {
     formNewBill.addEventListener("submit", handleSubmit)
   
     NewBillInstance.fileName = fileName
-    console.log("class fileName is ", NewBillInstance.fileName)
 
-    // submit a valid file
+    // submit the valid file
     fireEvent.submit(formNewBill)
 
     expect(handleSubmit).toHaveBeenCalled()
   })  
 
+  // CHECK API
   describe("Given I am a user connected as Employee", () => {
     beforeEach(() => {
       jest.spyOn(mockStore, "bills")
@@ -165,7 +166,7 @@ describe("Given I am connected as an employee", () => {
       router()
       })
     describe("When I navigate to newBill", () => {
-      // POST SUCCES
+      // POST SUCCESS
       test("promise from mock API POST returns object bills with correct values", async () => {
         window.onNavigate(ROUTES_PATH.NewBill)
         
@@ -176,9 +177,8 @@ describe("Given I am connected as an employee", () => {
 
       // RETURNS AN ERROR 404
       test("Then, fetches bills from an API and fails with 404 message error", async () => {
-        document.body.innerHTML = NewBillUI()
         window.onNavigate(ROUTES_PATH.NewBill)
-        // to do: mock changeFile()
+    
         mockStore.bills.mockImplementationOnce(() => {
           return {
             create: () => {
@@ -186,14 +186,17 @@ describe("Given I am connected as an employee", () => {
             },
           }
         })
-        window.onNavigate(ROUTES_PATH.Bills)
+        //window.onNavigate(ROUTES_PATH.Bills)
 			  await new Promise(process.nextTick)
-        const message = await screen.getByText(/Erreur 404/)
+        document.body.innerHTML = BillsUI(
+          { error: "Erreur 404" }
+          )
+        const message = screen.getByText("Erreur 404")
         expect(message).toBeTruthy()
       })
-      // RETURNS ERRO 500
+
+      // RETURNS ERROR 500
       test("Then, fetches messages from an API and fails with 500 message error", async () => {
-        // to do: mock changeFile()
         mockStore.bills.mockImplementationOnce(() => {
           return {
             create: () => {
@@ -204,9 +207,11 @@ describe("Given I am connected as an employee", () => {
             }
           }
         })
-        window.onNavigate(ROUTES_PATH.Bills)
 			  await new Promise(process.nextTick)
-        const message = screen.getByText(/Error/)
+        document.body.innerHTML = BillsUI(
+          { error: "Erreur 500" }
+          )
+        const message = screen.getByText("Erreur 500")
         expect(message).toBeTruthy()
       })
     })

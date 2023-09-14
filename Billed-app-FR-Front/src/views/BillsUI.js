@@ -46,7 +46,11 @@ export default ({ data: bills, loading, error }) => {
   } else if (error) {
     return ErrorPage(error)
   }
-  
+  // check if bills is an array
+  if (Array.isArray(bills)) {
+    const antiChrono = (a, b) => (a.date > b.date) ? 1 : -1;
+    bills.sort(antiChrono)
+  }
   return (`
     <div class='layout'>
       ${VerticalLayout(120)}
@@ -76,4 +80,5 @@ export default ({ data: bills, loading, error }) => {
       ${modal()}
     </div>`
   )
+
 }

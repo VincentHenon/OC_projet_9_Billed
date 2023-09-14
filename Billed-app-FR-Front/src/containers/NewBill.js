@@ -20,8 +20,7 @@ export default class NewBill {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const fileError = this.document.getElementById("fileError")
-    const filePath = e.target.value.split(/\\/g) // split the file path in parts
-    const fileName = filePath[filePath.length-1].toLowerCase() //keep the last part of file path to get the filename
+    const fileName = file.name
     this.isFileValid = false // set the state false by default
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
@@ -47,16 +46,11 @@ export default class NewBill {
       }).catch(error => console.error(error))
     } else {
       fileError.classList.remove("hidden")
-      //throw new Error("file should be a jpg or png format.")
     }
   }
   handleSubmit = e => {
       e.preventDefault()
-      console.log("filename ", this.fileName)
-      /*const fileExtension = this.fileName.split('.').pop().toLowerCase()
-      if (fileExtension.includes("jpeg") || fileExtension.includes("jpg") || fileExtension.includes("png")) {*/
       if (this.isFileValid) {
-        console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
         const email = JSON.parse(localStorage.getItem("user")).email
         const bill = {
           email,
